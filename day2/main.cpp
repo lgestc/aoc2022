@@ -44,7 +44,7 @@ int main()
 {
     std::ifstream file("./input");
 
-    std::vector<u_int8_t> results;
+    u_int32_t total = {0};
 
     if (file.is_open())
     {
@@ -54,19 +54,12 @@ int main()
         {
             u_int8_t res = result(line);
 
-            results.push_back(res);
+            total += res;
 
             std::cout << line << " result: " << unsigned(res) << std::endl;
         }
 
         file.close();
-    }
-
-    u_int32_t total = {0};
-
-    for (u_int8_t v : results)
-    {
-        total += v;
     }
 
     std::cout << "total: " << total << std::endl;
