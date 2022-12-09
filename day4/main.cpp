@@ -51,9 +51,9 @@ int main()
             b.end = stoi(raw_range_b[1]);
 
             if (
-                (a.start >= b.start && a.start <= b.end) || 
-                (b.start >= a.start && b.end <= a.end) || 
-                (a.end >= b.start && a.end <= b.end) || 
+                (a.start >= b.start && a.start <= b.end) ||
+                (b.start >= a.start && b.end <= a.end) ||
+                (a.end >= b.start && a.end <= b.end) ||
                 (b.end >= a.start && b.end <= a.end))
             {
                 std::cout << "overlap at " << line << std::endl;
