@@ -4,16 +4,112 @@
 #include <set>
 #include <string>
 
-// With 16 trees visible on the edge and another 5 visible in the interior,
-// a total of 21 trees are visible in this arrangement.
+typedef std::vector<std::vector<u_int8_t>> Grid;
+
+int score(Grid &grid, int x, int y)
+{
+    uint8_t h = grid[y][x];
+
+    int score_l = 0;
+    int score_r = 0;
+    int score_t = 0;
+    int score_d = 0;
+
+    bool skip_l = false;
+    bool skip_r = false;
+    bool skip_t = false;
+    bool skip_d = false;
+
+    for (int i = 1; i < grid.size(); i++)
+    {
+        // right
+        if (x + i < grid.size() && !skip_r)
+        {
+            int th = grid[y][x + i];
+
+            if (th < h)
+            {
+                score_r += 1;
+            }
+            else if (th == h)
+            {
+                score_r += 1;
+                skip_r = true;
+            }
+            else
+            {
+                skip_r = true;
+            }
+        }
+
+        // left
+        if (x - i >= 0 && !skip_l)
+        {
+            int th = grid[y][x - i];
+
+            if (th < h)
+            {
+                score_l += 1;
+            }
+            else if (th == h)
+            {
+                score_l += 1;
+                skip_l = true;
+            }
+            else
+            {
+                skip_l = true;
+            }
+        }
+
+        // top
+        if (y + i < grid.size() && !skip_t)
+        {
+            int th = grid[y + i][x];
+
+            if (th < h)
+            {
+                score_t += 1;
+            }
+            else if (th == h)
+            {
+                score_t += 1;
+                skip_t = true;
+            }
+            else
+            {
+                skip_t = true;
+            }
+        }
+
+        if (y - i >= 0 && !skip_d)
+        {
+            int th = grid[y - i][x];
+
+            if (th < h)
+            {
+                score_d += 1;
+            }
+            else if (th == h)
+            {
+                score_d += 1;
+                skip_d = true;
+            }
+            else
+            {
+                skip_d = true;
+            }
+        }
+    }
+
+    return score_l * score_r * score_d * score_t;
+}
 
 int main()
 {
     std::ifstream file("./input");
 
-    std::vector<std::vector<u_int8_t>> grid;
-
-    std::set<std::string> visible;
+    Grid grid;
 
     // Parse file into 2d array
     if (file.is_open())
@@ -34,82 +130,25 @@ int main()
         file.close();
     }
 
-    // Analyze
-    for (int y = 0; y < grid.size(); y++)
+    int top_score = 0;
+
+    // Analyze interior trees only
+    for (int y = 1; y < grid.size() - 1; y++)
     {
-        int highest = 0;
-        for (int x = 0; x < grid.size(); x++)
+        for (int x = 1; x < grid.size() - 1; x++)
         {
-            if (grid[y][x] > highest)
-            {
-                visible.insert(std::to_string(x) + " " + std::to_string(y));
-                highest = grid[y][x];
-            }
+            int s = score(grid, x, y);
 
-            if ((y == 0 || y == grid.size() - 1) || (x == 0 || x == grid.size() - 1))
+            if (s > top_score)
             {
-                visible.insert(std::to_string(x) + " " + std::to_string(y));
-            }
-        }
-
-        highest = 0;
-        for (int x = grid.size() - 1; x > 0; x--)
-        {
-            if (grid[y][x] > highest)
-            {
-                visible.insert(std::to_string(x) + " " + std::to_string(y));
-                highest = grid[y][x];
-            }
-        }
-    }
-
-    for (int x = 0; x < grid.size(); x++)
-    {
-        int highest = 0;
-        for (int y = 0; y < grid.size(); y++)
-        {
-            if (grid[y][x] > highest)
-            {
-                visible.insert(std::to_string(x) + " " + std::to_string(y));
-                highest = grid[y][x];
-            }
-        }
-
-        highest = 0;
-        for (int y = grid.size() - 1; y > 0; y--)
-        {
-            if (grid[y][x] > highest)
-            {
-                visible.insert(std::to_string(x) + " " + std::to_string(y));
-                highest = grid[y][x];
-            }
-        }
-    }
-
-    // Draw
-    for (int y = 0; y < grid.size(); y++)
-    {
-        for (int x = 0; x < grid.size(); x++)
-        {
-            std::string key = std::to_string(x) + " " + std::to_string(y);
-            std::string marker = " ";
-
-            if (visible.find(key) != visible.end())
-            {
-                marker = ".";
-            }
-
-            std::cout << marker << grid[y][x] << " ";
-            if (x == grid[y].size() - 1)
-            {
-                std::cout << std::endl;
+                top_score = s;
             }
         }
     }
 
     std::cout << std::endl;
 
-    std::cout << "visible trees: " << visible.size() << std::endl;
+    std::cout << top_score << std::endl;
 
     return 0;
 }
